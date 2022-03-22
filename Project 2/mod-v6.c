@@ -29,7 +29,7 @@ typedef struct {
     unsigned int size1;
     unsigned int addr[9];
     unsigned int actime;
-unsigned int modtime;
+    unsigned int modtime;
 } inode_type;
 
 typedef struct { 
