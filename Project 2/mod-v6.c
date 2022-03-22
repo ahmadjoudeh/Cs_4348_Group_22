@@ -63,12 +63,18 @@ void initfs(char *file_name , int n1, int n2){
 
 }
 
-int get_free_block(){
-    return 1;
+int get_free_block(superblock_type sup){
+    if(sup.nfree == 0)
+        return -1;
+    return sup.free[sup.nfree--];
 }
 
-int add_free_block(int num){
-    return 1;
+int add_free_block(unsigned int num, superblock_type sup){
+    if(sup.nfree < 200){
+        sup.free[sup.nfree++] = num;
+        return 1;
+    }
+    return -1;
 }
 
 // Function to read inodes
@@ -93,7 +99,6 @@ int i;
     root.addr[0]=100; //assuming that blocks 2 to 99 are for i-nodes; 100 is the first data block that can hold root's directory contents
 	for (i=1;i<9;i++) root.addr[i]=-1;//all other addr elements are null so setto -1
     inode_writer(inum, root);
-
 }
 
 // The main function
