@@ -10,6 +10,17 @@
 #define INODE_SIZE 64
 
 typedef struct {
+    int isize;
+    int fsize;
+    int nfree;
+    unsigned int free[200];
+    char flock;
+    char ilock;
+    char fmod;
+    unsigned int time;
+} superblock_type;
+
+typedef struct {
     unsigned short flags;
     unsigned short nlinks;
     unsigned int uid;
