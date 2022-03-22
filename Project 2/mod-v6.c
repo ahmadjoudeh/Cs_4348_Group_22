@@ -59,6 +59,18 @@ void inode_writer(int inum, inode_type inode){
     write(fd,&inode,sizeof(inode));
 }
 
+void initfs(char *file_name , int n1, int n2){
+
+}
+
+int get_free_block(){
+    return 1;
+}
+
+int add_free_block(int num){
+    return 1;
+}
+
 // Function to read inodes
 inode_type inode_reader(int inum, inode_type inode){
    lseek(fd,2*BLOCK_SIZE+(inum-1)*INODE_SIZE,SEEK_SET); 
