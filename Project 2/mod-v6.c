@@ -60,7 +60,11 @@ void inode_writer(int inum, inode_type inode){
 }
 
 void initfs(char *file_name , int n1, int n2){
+    if(open_fs(file_name) == 1){
 
+    }
+    else
+        printf("ERROR: File open failed.");
 }
 
 int get_free_block(superblock_type sup){
