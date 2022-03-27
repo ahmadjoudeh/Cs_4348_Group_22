@@ -18,6 +18,8 @@ typedef struct {
     char ilock;
     char fmod;
     unsigned int time;
+    unsigned short ninode;
+    unsigned short inode[100];
 } superblock_type;
 
 superblock_type superBlock;
@@ -70,6 +72,7 @@ void initfs(char *file_name , int n1, int n2){
 	
     superBlock.isize = n2;
     superBlock.fsize = n1;
+    
 }
 
 int get_free_block(){
