@@ -20,6 +20,8 @@ typedef struct {
     unsigned int time;
 } superblock_type;
 
+superblock_type superBlock;
+
 typedef struct {
     unsigned short flags;
     unsigned short nlinks;
@@ -65,6 +67,9 @@ void initfs(char *file_name , int n1, int n2){
     }
     else
         printf("ERROR: File open failed.");
+	
+    superBlock.isize = n2;
+    superBlock.fsize = n1;   
 }
 
 int get_free_block(superblock_type sup){
