@@ -69,18 +69,18 @@ void initfs(char *file_name , int n1, int n2){
         printf("ERROR: File open failed.");
 	
     superBlock.isize = n2;
-    superBlock.fsize = n1;   
+    superBlock.fsize = n1;
 }
 
-int get_free_block(superblock_type sup){
-    if(sup.nfree == 0)
+int get_free_block(){
+    if(superBlock.nfree == 0)
         return -1;
-    return sup.free[sup.nfree--];
+    return superBlock.free[superBlock.nfree--];
 }
 
-int add_free_block(unsigned int num, superblock_type sup){
-    if(sup.nfree < 200){
-        sup.free[sup.nfree++] = num;
+int add_free_block(unsigned int num){
+    if(superBlock.nfree < 200){
+        superBlock.free[superBlock.nfree++] = num;
         return 1;
     }
     return -1;
