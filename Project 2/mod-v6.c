@@ -52,27 +52,44 @@ int open_fs(char *file_name){
         return -1;
     }
     else{
-        return 1;
+        return fd;
     }
 }
 
 // Function to write inode
 void inode_writer(int inum, inode_type inode){
-
    lseek(fd,2*BLOCK_SIZE+(inum-1)*INODE_SIZE,SEEK_SET); 
     write(fd,&inode,sizeof(inode));
 }
 
 void initfs(char *file_name , int n1, int n2){
-    if(open_fs(file_name) == 1){
-
+    int fd = open_fs(file_name);
+    if(fd != -1){
+        superBlock.isize = n2;
+        superBlock.fsize = n1;
+        if((n1 - n2 - 2) >= 200){ // in the case that there is enough blocks to fill free[]
+            superBlock.nfree = 199;
+            int i , j = 0;
+            for(i=199; i > 0; i--){
+                superBlock.free[i] = 2 + n2 + j;
+                j++; // this for loop gives the next available
+                // free block to the free array, 
+                // from free[199] down to free[1]
+            }
+            lseek(fd, ((n2 * INODE_SIZE) + (2 * BLOCK_SIZE)), SEEK_SET); // seeks to point after root and superblock and inodes
+            write(fd, " ", 1);
+        }
+        else{
+            superBlock.nfree = n1 - n2 - 2;
+            int i , j = 0;
+            for(i=superBlock.nfree; i > 0; i--){
+                superBlock.free[i] = 2 + n2 + j;
+                j++;
+            }
+        }
     }
     else
         printf("ERROR: File open failed.");
-	
-    superBlock.isize = n2;
-    superBlock.fsize = n1;
-    
 }
 
 int get_free_block(){
@@ -115,11 +132,9 @@ int i;
 
 // The main function
 int main(){
-
     inode_type inode1;
     open_fs("Test_fs.txt");
     fill_an_inode_and_write(1);
     inode1=inode_reader(1,inode1);
-    printf("Value of inode1's addr[0] is %d\n",inode1.addr[0]);
-    printf("Value of inode1's addr[1] is %d\n",inode1.addr[1]);
+    initfs("Test_fs.txt", 500, 16);
 }
