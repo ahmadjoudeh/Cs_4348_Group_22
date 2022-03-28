@@ -62,35 +62,6 @@ void inode_writer(int inum, inode_type inode){
     write(fd,&inode,sizeof(inode));
 }
 
-void initfs(char *file_name , int n1, int n2){
-    int fd = open_fs(file_name);
-    if(fd != -1){
-        superBlock.isize = n2;
-        superBlock.fsize = n1;
-        if((n1 - n2 - 2) >= 200){ // in the case that there is enough blocks to fill free[]
-            superBlock.nfree = 199;
-            int i , j = 0;
-            for(i=199; i > 0; i--){
-                superBlock.free[i] = 2 + n2 + j;
-                j++; // this for loop gives the next available
-                // free block to the free array, 
-                // from free[199] down to free[1]
-            }
-            lseek(fd, ((n2 * INODE_SIZE) + (2 * BLOCK_SIZE)), SEEK_SET); // seeks to point after root and superblock and inodes
-            write(fd, " ", 1);
-        }
-        else{
-            superBlock.nfree = n1 - n2 - 2;
-            int i , j = 0;
-            for(i=superBlock.nfree; i > 0; i--){
-                superBlock.free[i] = 2 + n2 + j;
-                j++;
-            }
-        }
-    }
-    else
-        printf("ERROR: File open failed.");
-}
 
 int get_free_block(){
     if(superBlock.nfree == 0)
@@ -125,16 +96,49 @@ int i;
 
     root.size0 = 0;
     root.size1 = 2 * sizeof(dir_type);
-    root.addr[0]=100; //assuming that blocks 2 to 99 are for i-nodes; 100 is the first data block that can hold root's directory contents
-	for (i=1;i<9;i++) root.addr[i]=-1;//all other addr elements are null so setto -1
+    root.addr[0] = 2 + superBlock.free[superBlock.nfree--];
+    for (i=1;i<9;i++) root.addr[i]=-1;//all other addr elements are null so setto -1
     inode_writer(inum, root);
 }
 
+void initfs(char *file_name , int n1, int n2){
+    int fd = open_fs(file_name);
+
+    if(fd != -1){
+        superBlock.isize = n2;
+        superBlock.fsize = n1;
+        if((n1 - n2 - 2) >= 200){ // in the case that there is enough blocks to fill free[]
+            superBlock.nfree = 199;
+            int i , j = 0;
+            for(i=199; i > 0; i--){
+                superBlock.free[i] = 2 + n2 + j;
+                j++; // this for loop gives the next available
+                // free block to the free array, 
+                // from free[199] down to free[1]
+            }
+        }
+        else{
+            superBlock.nfree = n1 - n2 - 2;
+            int i , j = 0;
+            for(i=superBlock.nfree; i > 0; i--){
+                superBlock.free[i] = 2 + n2 + j;
+                j++;
+            }
+        }
+
+        inode_type inode1;
+        fill_an_inode_and_write(1);
+        inode1 = inode_reader(1,inode1);
+
+        lseek(fd, ((n2 * INODE_SIZE) + (2 * BLOCK_SIZE)), SEEK_SET); // seeks to point after root and superblock and inodes
+        write(fd, " ", 1);
+    }
+    else
+        printf("ERROR: File open failed.");
+}
+
+
 // The main function
 int main(){
-    inode_type inode1;
-    open_fs("Test_fs.txt");
-    fill_an_inode_and_write(1);
-    inode1=inode_reader(1,inode1);
     initfs("Test_fs.txt", 500, 16);
 }
