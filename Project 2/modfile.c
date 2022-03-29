@@ -133,13 +133,14 @@ void initfs(char *file_name , int n1, int n2){
         root.nlinks = 1;
         root.uid = 0;
         root.gid = 0;
-        root.size = 0;
+        root.size0 = 0;
+	root.size1 = 0;
         root.addr[0] = n2 + 2;
-	    root.addr[1] = 0;
+	root.addr[1] = 0;
 
         //write root inode to disk
         lseek(fd, 2 * BLOCK_SIZE, SEEK_SET);
-	    write(fd, &root, INODE_SIZE);
+	write(fd, &root, INODE_SIZE);
 
         //init root dir
         root_dir[0].inode = 1;
