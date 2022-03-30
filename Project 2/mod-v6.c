@@ -181,7 +181,33 @@ void printfs() {
     printf("\nInode Info\n...");
 
 }
+void fs(){
+    int n1;
+    int n2;
+    char str_n1[10000];
+    char str_n2[10000];
+    char filename[1000];
 
+    printf("Please enter the desired name for the name containing your file system:\n\n>>");
+    fgets(filename, 1000, stdin);
+    filename[strlen(filename)-1] = '\0'; // remove newline and replace with null terminator
+
+    printf("Please enter the maximum number of blocks for the filesystem (0 - 9999):\n\n>>");
+    fgets(str_n1, 10000, stdin);
+    n1 = atoi(str_n1);
+
+    printf("Please enter the number of blocks dedicated to the i-nodes (0-9999):\n\n>>");
+    fgets(str_n2, 10000, stdin);
+    n2 = atoi(str_n2);
+
+    printf("Initializing file system in %s with %d blocks and %d i-nodes...\n", filename, n1, n2);
+    initfs(filename, n1, n2);
+    sleep(2); // simulated runtime
+    printf("File system initialized in file %s\n", filename);
+    
+    printf("\nPress Enter to return to the Main menu.\n\n>>");
+    getchar();
+}
 
 // The main function
 int main(){
@@ -207,47 +233,15 @@ int main(){
             i++;
             command[i] = ch;
         }
-        //printf("%s", command); //for debugging
-
 
         // using if-else structure since switch statements in C cannot be used for strings.
-        if (strcmp("initfs\n", input) == 0) {
-            int n1;
-            int n2;
-            char str_n1[10000];
-            char str_n2[10000];
-            char filename[1000];
-            
-            printf("Please enter the desired name for the name containing your file system:\n\n>>");
-            fgets(filename, 1000, stdin);
-            filename[strlen(filename)-1] = '\0'; // remove newline and replace with null terminator
-
-            printf("Please enter the maximum number of blocks for the filesystem (0 - 9999):\n\n>>");
-            fgets(str_n1, 10000, stdin);
-            n1 = atoi(str_n1);
-
-            printf("Please enter the number of blocks dedicated to the i-nodes (0-9999):\n\n>>");
-            fgets(str_n2, 10000, stdin);
-            n2 = atoi(str_n2);
-
-            printf("Initializing file system in %s with %d blocks and %d i-nodes...\n", filename, n1, n2);
-            initfs(filename, n1, n2);
-            sleep(2); // simulated runtime
-            printf("File system initialized in file %s\n", filename);
-            
-            printf("\nPress Enter to return to the Main menu.\n\n>>");
-            getchar();
-        } else if (strcmp("q\n", input) == 0) {
+        if (strcmp("initfs\n", input) == 0)
+            fs();
+        else if (strcmp("q\n", input) == 0)
             q();
-        } else {
+        else{
             printf("\nERROR: invalid input\n\n\n");
             continue;
         }
-
-        //simplified user interaction
-        /* if(strcmp(input, "initfs") == 0)
-            initfs("Test_fs.txt", 500, 16);
-        else if(strcmp(input, "q") == 0)
-            q(); */
     }
 }
