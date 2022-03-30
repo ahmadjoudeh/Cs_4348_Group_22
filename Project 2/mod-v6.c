@@ -183,5 +183,27 @@ void printfs() {
 // The main function
 int main(){
     initfs("Test_fs.txt", 500, 16);
+    while(true){
+        printf("Unix V6 File System Simulation\n");
+        printf("Available commands:\n");
+        
+        char input[1000];
+        fgets(input, 1000, stdin);
+        char delim[] = " ";
+        char *ptr = strtok(input, delim);
+
+
+
+        switch(input) {
+            case "initfs":
+
+                break;
+            case "q":
+                printf("You are now quitting the program");
+                exit(0);
+                break;
+        }
+
+    }
     q();
 }
