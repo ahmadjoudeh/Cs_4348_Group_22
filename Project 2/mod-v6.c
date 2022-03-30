@@ -5,6 +5,7 @@
 #include<unistd.h>
 #include<stdlib.h>
 #include<time.h>
+#include<stdbool.h>
 
 #define BLOCK_SIZE 1024
 #define INODE_SIZE 64
@@ -182,28 +183,16 @@ void printfs() {
 
 // The main function
 int main(){
-    initfs("Test_fs.txt", 500, 16);
-    while(true){
+    while(1){
         printf("Unix V6 File System Simulation\n");
         printf("Available commands:\n");
         
         char input[1000];
-        fgets(input, 1000, stdin);
-        char delim[] = " ";
-        char *ptr = strtok(input, delim);
+        scanf("%s", input);
 
-
-
-        switch(input) {
-            case "initfs":
-
-                break;
-            case "q":
-                printf("You are now quitting the program");
-                exit(0);
-                break;
-        }
-
+        if(strcmp(input, "initfs") == 0)
+            initfs("Test_fs.txt", 500, 16);
+        else if(strcmp(input, "q") == 0)
+            q();
     }
-    q();
 }
