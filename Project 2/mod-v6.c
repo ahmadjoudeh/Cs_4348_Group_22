@@ -185,7 +185,6 @@ void printfs() {
 
 // The main function
 int main(){
-    //initfs("Test_fs.txt", 500, 16);
     while(true){
         printf("Unix V6 File System Simulation\n");
         printf("==================================================================================================\n");
@@ -201,14 +200,14 @@ int main(){
         // accept input from user
         fgets(input, 1000, stdin);
 
-        // convert input to lower case
+        // convert input to lower case NOT FUNCTIONING PROPERLY CURRENTLY NOT BEING USED
         int i = 0;
         while(input[i]) {
             char ch = tolower(input[i]);
             i++;
             command[i] = ch;
         }
-            //printf("%s", command); //for debugging
+        //printf("%s", command); //for debugging
 
 
         // using if-else structure since switch statements in C cannot be used for strings.
@@ -245,33 +244,10 @@ int main(){
             continue;
         }
 
-        // switch statements cannot be used for strings in C
-/*         switch(input) {
-            case 'initfs':
-                   int n1;
-                   int n2;
-                   char filename[1000];
-                   printf("Please enter the desired name for the name containing your file system:\n");
-                   fgets(filename, 1000, stdin);
-                   printf("Please enter the maximum number of blocks for the filesystem (0 - 9999):\n");
-                   fgets(n1, 10000, stdin);
-                   printf("Please enter the number of blocks dedicated to the i-nodes (0-9999):\n");
-                   fgets(n2, 10000, stdin);
-                   printf("Initializing file system in %s with %d blocks and %d i-nodes...", filename, n1, n2);
-                   initfs(filename, n1, n2);
-                   printf("")
-                break;
-            case 'q':
-                    printf("You are now quitting the program");
-                exit(0);
-                break;
-            default:
-            printf("Invalid command");
-        } */
-
-        if(strcmp(input, "initfs") == 0)
+        //simplified user interaction
+        /* if(strcmp(input, "initfs") == 0)
             initfs("Test_fs.txt", 500, 16);
         else if(strcmp(input, "q") == 0)
-            q();
+            q(); */
     }
 }
