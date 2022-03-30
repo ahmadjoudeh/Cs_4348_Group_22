@@ -5,6 +5,8 @@
 #include<unistd.h>
 #include<stdlib.h>
 #include<time.h>
+#include<stdbool.h>
+#include<ctype.h>
 
 #define BLOCK_SIZE 1024
 #define INODE_SIZE 64
@@ -162,7 +164,8 @@ void initfs(char *file_name , int n1, int n2){
 }
 
 void q() {
-    printf("\nClosing file system...\n");
+    printf("\nClosing file system and simulation...\n");
+    sleep(1); // simulated runtime
     exit(0);
 }
 
@@ -182,28 +185,89 @@ void printfs() {
 
 // The main function
 int main(){
-    initfs("Test_fs.txt", 500, 16);
+    //initfs("Test_fs.txt", 500, 16);
     while(true){
         printf("Unix V6 File System Simulation\n");
+        printf("==================================================================================================\n");
+       
+        // prompt user for input
         printf("Available commands:\n");
+        printf("initfs - Initializes file system with specified parameters.\nq - Quits the simulation.\n\n>>");
         
+        // initialize needed strings
         char input[1000];
+        char command[1000];
+
+        // accept input from user
         fgets(input, 1000, stdin);
-        char delim[] = " ";
-        char *ptr = strtok(input, delim);
+
+        // convert input to lower case
+        int i = 0;
+        while(input[i]) {
+            char ch = tolower(input[i]);
+            i++;
+            command[i] = ch;
+        }
+            //printf("%s", command); //for debugging
 
 
+        // using if-else structure since switch statements in C cannot be used for strings.
+        if (strcmp("initfs\n", input) == 0) {
+            int n1;
+            int n2;
+            char str_n1[10000];
+            char str_n2[10000];
+            char filename[1000];
+            
+            printf("Please enter the desired name for the name containing your file system:\n\n>>");
+            fgets(filename, 1000, stdin);
+            filename[strlen(filename)-1] = '\0'; // remove newline and replace with null terminator
 
-        switch(input) {
-            case "initfs":
+            printf("Please enter the maximum number of blocks for the filesystem (0 - 9999):\n\n>>");
+            fgets(str_n1, 10000, stdin);
+            n1 = atoi(str_n1);
 
-                break;
-            case "q":
-                printf("You are now quitting the program");
-                exit(0);
-                break;
+            printf("Please enter the number of blocks dedicated to the i-nodes (0-9999):\n\n>>");
+            fgets(str_n2, 10000, stdin);
+            n2 = atoi(str_n2);
+
+            printf("Initializing file system in %s with %d blocks and %d i-nodes...\n", filename, n1, n2);
+            initfs(filename, n1, n2);
+            sleep(2); // simulated runtime
+            printf("File system initialized in file %s\n", filename);
+            
+            printf("\nPress Enter to return to the Main menu.\n\n>>");
+            getchar();
+        } else if (strcmp("q\n", input) == 0) {
+            q();
+        } else {
+            printf("\nERROR: invalid input\n\n\n");
+            continue;
         }
 
+        // switch statements cannot be used for strings in C
+/*         switch(input) {
+            case 'initfs':
+                   int n1;
+                   int n2;
+                   char filename[1000];
+                   printf("Please enter the desired name for the name containing your file system:\n");
+                   fgets(filename, 1000, stdin);
+                   printf("Please enter the maximum number of blocks for the filesystem (0 - 9999):\n");
+                   fgets(n1, 10000, stdin);
+                   printf("Please enter the number of blocks dedicated to the i-nodes (0-9999):\n");
+                   fgets(n2, 10000, stdin);
+                   printf("Initializing file system in %s with %d blocks and %d i-nodes...", filename, n1, n2);
+                   initfs(filename, n1, n2);
+                   printf("")
+                break;
+            case 'q':
+                    printf("You are now quitting the program");
+                exit(0);
+                break;
+            default:
+            printf("Invalid command");
+        } */
+
     }
-    q();
 }
