@@ -154,7 +154,7 @@ void initfs(char *file_name , int n1, int n2){
             fill_an_inode_and_write(i);
         } 
 
-        lseek(fd, ((n2 * INODE_SIZE) + (2 * BLOCK_SIZE)), SEEK_SET); // seeks to point after root and superblock and inodes
+        lseek(fd, n1 * BLOCK_SIZE , SEEK_SET); // seeks to very end of file system, so that the correct data size is shown
         write(fd, " ", 1);
     }
     else
