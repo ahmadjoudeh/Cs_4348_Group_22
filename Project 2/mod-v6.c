@@ -8,6 +8,7 @@
 
 #define BLOCK_SIZE 1024
 #define INODE_SIZE 64
+#define DIR_SIZE 32
 
 typedef struct {
     int isize;
@@ -42,6 +43,7 @@ typedef struct {
 } dir_type;  //32 Bytes long
 
 inode_type root;
+dir_type root_dir[2];
 
 int fd;
 
@@ -125,7 +127,19 @@ void initfs(char *file_name , int n1, int n2){
                 j++;
             }
         }
+        
+        //init root dir
+        root_dir[0].inode = 1;
+        strcpy((char*) root_dir[0].filename, ".");
+        root_dir[1].inode = 1;
+        strcpy((char*) root_dir[1].filename, "..");
 
+        //Root dir to disk
+        lseek(fd, (n2+2) * BLOCK_SIZE, SEEK_SET);
+        write(fd, &root_dir[0], DIR_SIZE);
+        lseek(fd, (n2+2) * BLOCK_SIZE + DIR_SIZE, SEEK_CUR);
+        write(fd, &root_dir[1], DIR_SIZE);
+        
         inode_type inode1;
         fill_an_inode_and_write(1);
         inode1 = inode_reader(1,inode1);
