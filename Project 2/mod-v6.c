@@ -128,6 +128,10 @@ void initfs(char *file_name , int n1, int n2){
             }
         }
         
+        // write superblock
+        lseek(fd, BLOCK_SIZE, SEEK_SET);
+        write(fd, &superBlock, 1);
+
         //init root dir
         root_dir[0].inode = 1;
         strcpy((char*) root_dir[0].filename, ".");
@@ -144,6 +148,12 @@ void initfs(char *file_name , int n1, int n2){
         fill_an_inode_and_write(1);
         inode1 = inode_reader(1,inode1);
 
+        //write inodes
+        lseek(fd, (2 * BLOCK_SIZE), SEEK_SET);
+        for (int i = 0; i < superBlock.isize; i++ ) {
+            fill_an_inode_and_write(i);
+        } 
+
         lseek(fd, ((n2 * INODE_SIZE) + (2 * BLOCK_SIZE)), SEEK_SET); // seeks to point after root and superblock and inodes
         write(fd, " ", 1);
     }
@@ -151,8 +161,27 @@ void initfs(char *file_name , int n1, int n2){
         printf("ERROR: File open failed.");
 }
 
+void q() {
+    printf("\nClosing file system...\n");
+    exit(0);
+}
+
+//printfs for debugging (not currently comprehensive)
+void printfs() {
+    printf("Superblock Info\n");
+    printf("\tnumber of inodes: %d\n", superBlock.isize);
+    printf("\tnumber of blocks: %d\n", superBlock.fsize);
+    printf("\tsize of block: %d\n", BLOCK_SIZE);
+    printf("\tnfree: %d", superBlock.nfree);
+    //etc
+
+    printf("\nInode Info\n...");
+
+}
+
 
 // The main function
 int main(){
     initfs("Test_fs.txt", 500, 16);
+    q();
 }
