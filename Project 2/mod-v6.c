@@ -269,5 +269,9 @@ int main(){
             printf("Invalid command");
         } */
 
+        if(strcmp(input, "initfs") == 0)
+            initfs("Test_fs.txt", 500, 16);
+        else if(strcmp(input, "q") == 0)
+            q();
     }
 }
