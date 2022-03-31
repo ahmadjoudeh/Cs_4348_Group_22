@@ -4,7 +4,6 @@ Andrew Estes
 Ahmad Joudeh
 Viswa Rajagopalan
 */
-
 #include<stdio.h>
 #include<string.h>
 #include<fcntl.h>
@@ -73,13 +72,13 @@ void inode_writer(int inum, inode_type inode){
     write(fd,&inode,sizeof(inode));
 }
 
-
+//Returns the address of a free data block from the free list and otherwise if some error occurs returns -1
 int get_free_block(){
     if(superBlock.nfree == 0)
         return -1;
     return superBlock.free[superBlock.nfree--];
 }
-
+//Takes the address of a block to be added to the free list and returns 1 if everything works and -1 if some error occurs
 int add_free_block(unsigned int num){
     if(superBlock.nfree < 200){
         superBlock.free[superBlock.nfree++] = num;
