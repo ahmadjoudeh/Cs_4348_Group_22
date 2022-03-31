@@ -1,3 +1,10 @@
+/*
+Group 22
+Andrew Estes
+Ahmad Joudeh
+Viswa Rajagopalan
+*/
+
 #include<stdio.h>
 #include<string.h>
 #include<fcntl.h>
