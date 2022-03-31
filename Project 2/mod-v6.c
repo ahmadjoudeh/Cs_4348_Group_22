@@ -112,9 +112,9 @@ int i;
     inode_writer(inum, root);
 }
 
+// initializes file system, superblock, root directory etc.
 void initfs(char *file_name , int n1, int n2){
     int fd = open_fs(file_name);
-
     if(fd != -1){
         superBlock.isize = n2;
         superBlock.fsize = n1;
@@ -171,24 +171,14 @@ void initfs(char *file_name , int n1, int n2){
         printf("ERROR: File open failed.");
 }
 
+// quits program
 void q() {
     printf("\nClosing file system and simulation...\n");
     sleep(1); // simulated runtime
     exit(0);
 }
 
-//printfs for debugging (not currently comprehensive)
-void printfs() {
-    printf("Superblock Info\n");
-    printf("\tnumber of inodes: %d\n", superBlock.isize);
-    printf("\tnumber of blocks: %d\n", superBlock.fsize);
-    printf("\tsize of block: %d\n", BLOCK_SIZE);
-    printf("\tnfree: %d", superBlock.nfree);
-    //etc
-
-    printf("\nInode Info\n...");
-
-}
+// runs user interaction for file system
 void fs(){
     int n1;
     int n2;
@@ -213,15 +203,6 @@ void fs(){
     sleep(2); // simulated runtime
     printf("File system initialized in file %s\n", filename);
     
-    /*
-    inode_type fake = inode_reader(1,fake);
-    printf("%d", fake.size1);
-
-    lseek(fd, BLOCK_SIZE * 2, SEEK_SET);
-    read(fd, , 16);
-    printf("%s", buf);
-    */
-
     printf("\nPress Enter to return to the Main menu.\n\n>>");
     getchar();
 }
