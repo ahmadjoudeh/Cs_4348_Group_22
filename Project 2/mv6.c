@@ -2,7 +2,7 @@
 Group 22
 Andrew Estes
 Ahmad Joudeh
-Viswa Rajagopalan
+Viswajith Rajagopalan 
 */
 #include<stdio.h>
 #include<string.h>
