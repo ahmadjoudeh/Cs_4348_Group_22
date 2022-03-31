@@ -84,7 +84,7 @@ int add_free_block(unsigned int num){
 // Function to read inodes
 inode_type inode_reader(int inum, inode_type inode){
    lseek(fd,2*BLOCK_SIZE+(inum-1)*INODE_SIZE,SEEK_SET); 
-    read(fd, &inode, sizeof(inode));
+   read(fd, &inode, sizeof(inode));
     return inode;
 }
 
@@ -120,6 +120,7 @@ void initfs(char *file_name , int n1, int n2){
                 // free block to the free array, 
                 // from free[199] down to free[1]
             }
+            //superBlock.free[0] = ;
         }
         else{
             superBlock.nfree = n1 - n2 - 2;
@@ -205,6 +206,15 @@ void fs(){
     sleep(2); // simulated runtime
     printf("File system initialized in file %s\n", filename);
     
+    /*
+    inode_type fake = inode_reader(1,fake);
+    printf("%d", fake.size1);
+
+    lseek(fd, BLOCK_SIZE * 2, SEEK_SET);
+    read(fd, , 16);
+    printf("%s", buf);
+    */
+
     printf("\nPress Enter to return to the Main menu.\n\n>>");
     getchar();
 }
