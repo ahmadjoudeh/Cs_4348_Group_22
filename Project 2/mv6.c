@@ -220,7 +220,7 @@ void cpin(){
 
     lseek(fd, get_free_block() * BLOCK_SIZE , SEEK_SET);
     write(fd, fileBuf, BLOCK_SIZE);
-
+    
     fclose(file);
 }
 
