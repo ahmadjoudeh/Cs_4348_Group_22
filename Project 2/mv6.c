@@ -205,6 +205,22 @@ void fs(){
     printf("\nPress Enter to return to the Main menu.\n\n>>");
     getchar();
 }
+void cpin(){
+    char fileBuf[BLOCK_SIZE]; // where the contents of the file will be stored
+    char nameBuf[1000]; // where the name of the file we create will be stored
+
+    //open file for reading and place contents in buffer
+    printf("Enter the name of the file in the local file system: ");
+    fgets(nameBuf, 1000, stdin);
+    FILE *file = fopen(nameBuf, "r");
+    fgets(fileBuf, BLOCK_SIZE, file);
+
+    // get name of file we will create
+    printf("Enter the name that you want for the file in the V6 file system: ");
+    fgets(nameBuf, 1000, stdin);
+
+    fclose(file);
+}
 
 // The main function
 int main(){
@@ -214,7 +230,7 @@ int main(){
        
         // prompt user for input
         printf("Available commands:\n");
-        printf("initfs - Initializes file system with specified parameters.\nq - Quits the simulation.\n\n>>");
+        printf("initfs - Initializes file system with specified parameters.\ncpin - Create a new file inside V6 file system, using a file from local filesystem\nq - Quits the simulation.\n\n>>");
         
         // initialize needed strings
         char input[1000];
@@ -236,6 +252,8 @@ int main(){
             fs();
         else if (strcmp("q\n", input) == 0)
             q();
+        else if (strcmp("cpin\n", input) == 0)
+            cpin();
         else{
             printf("\nERROR: invalid input\n\n\n");
             continue;
