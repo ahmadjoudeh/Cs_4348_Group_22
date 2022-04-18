@@ -200,8 +200,7 @@ void fs(){
     printf("Initializing file system in %s with %d blocks and %d i-nodes...\n", filename, n1, n2);
     initfs(filename, n1, n2);
     sleep(2); // simulated runtime
-    printf("File system initialized in file %s\n", filename);
-    
+    printf("File system initialized in file %s\n", filename);    
     printf("\nPress Enter to return to the Main menu.\n\n>>");
     getchar();
 }
@@ -218,6 +217,9 @@ void cpin(){
     // get name of file we will create
     printf("Enter the name that you want for the file in the V6 file system: ");
     fgets(nameBuf, 1000, stdin);
+
+    lseek(fd, get_free_block() * BLOCK_SIZE , SEEK_SET);
+    write(fd, fileBuf, BLOCK_SIZE);
 
     fclose(file);
 }
