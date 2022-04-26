@@ -51,7 +51,9 @@ typedef struct {
 } dir_type;  //32 Bytes long
 
 inode_type root;
-dir_type root_dir[2];
+dir_type root_dir[100];
+int numDirEntry = 2;
+int numInodes = 1;
 
 int fd;
 
@@ -148,9 +150,11 @@ void initfs(char *file_name , int n1, int n2){
         strcpy((char*) root_dir[1].filename, "..");
 
         //Root dir to disk
-        lseek(fd, (n2+2) * BLOCK_SIZE, SEEK_SET);
+        int x;
+        x = get_free_block();
+        lseek(fd, x * BLOCK_SIZE, SEEK_SET);
         write(fd, &root_dir[0], DIR_SIZE);
-        lseek(fd, (n2+2) * BLOCK_SIZE + DIR_SIZE, SEEK_CUR);
+        lseek(fd, x * BLOCK_SIZE + DIR_SIZE, SEEK_SET);
         write(fd, &root_dir[1], DIR_SIZE);
         
         inode_type inode1;
@@ -158,7 +162,7 @@ void initfs(char *file_name , int n1, int n2){
         inode1 = inode_reader(1,inode1);
 
         //write inodes
-        lseek(fd, (2 * BLOCK_SIZE), SEEK_SET);
+        lseek(fd, get_free_block(), SEEK_SET);
         for (int i = 0; i < superBlock.isize; i++ ) {
             fill_an_inode_and_write(i);
         } 
@@ -197,7 +201,7 @@ void fs(){
     fgets(str_n2, 10000, stdin);
     n2 = atoi(str_n2);
 
-    printf("Initializing file system in %s with %d blocks and %d i-nodes...\n", filename, n1, n2);
+    printf("Initializing file system in %s with %d blocks and %d blocks of i-nodes...\n", filename, n1, n2);
     initfs(filename, n1, n2);
     sleep(2); // simulated runtime
     printf("File system initialized in file %s\n", filename);    
@@ -206,22 +210,59 @@ void fs(){
 }
 void cpin(){
     char fileBuf[BLOCK_SIZE]; // where the contents of the file will be stored
+    char fileBuf2[BLOCK_SIZE];
     char nameBuf[1000]; // where the name of the file we create will be stored
 
     //open file for reading and place contents in buffer
     printf("Enter the name of the file in the local file system: ");
-    fgets(nameBuf, 1000, stdin);
+    
+   scanf("%s", nameBuf);
+   fflush(stdin);
     FILE *file = fopen(nameBuf, "r");
-    fgets(fileBuf, BLOCK_SIZE, file);
+    if(file != NULL)
+        fgets(fileBuf, BLOCK_SIZE, file);
 
     // get name of file we will create
     printf("Enter the name that you want for the file in the V6 file system: ");
-    fgets(nameBuf, 1000, stdin);
+    scanf("%s", nameBuf);
+    fflush(stdin);
 
-    lseek(fd, get_free_block() * BLOCK_SIZE , SEEK_SET);
+    int x;
+    x = get_free_block();
+    lseek(fd, x * BLOCK_SIZE , SEEK_SET);
     write(fd, fileBuf, BLOCK_SIZE);
+
+    int i;
+    inode_type newInode;
+    for (i=1;i<9;i++) newInode.addr[i]=-1;
+    newInode.addr[0] = x;
+    inode_writer(++numInodes, newInode);
+
+    dir_type newDir;
+    strcpy((char*)newDir.filename, nameBuf);
+    newDir.inode = numInodes;
+
+    lseek(fd, x*BLOCK_SIZE,SEEK_SET);
+    read(fd, fileBuf2,3);
+    printf("\n%s\n", fileBuf2);
     
     fclose(file);
+}
+void cpout(){
+    char nameBuf[1000]; // where the name of the file we create will be stored
+
+    printf("Enter the name of the file in the local file system: ");
+    scanf("%s", nameBuf);
+    fflush(stdin);
+    int target;
+    int i;
+    for(i=2; i<numDirEntry; i++){
+        if(strcmp(nameBuf,root_dir[i].filename) == 0){
+            target = root_dir[i].inode;
+            break;
+        }
+
+    }
 }
 
 // The main function
@@ -232,7 +273,7 @@ int main(){
        
         // prompt user for input
         printf("Available commands:\n");
-        printf("initfs - Initializes file system with specified parameters.\ncpin - Create a new file inside V6 file system, using a file from local filesystem\nq - Quits the simulation.\n\n>>");
+        printf("initfs - Initializes file system with specified parameters.\ncpin - Create a new file inside V6 file system, using a file from local filesystem\ncpout - create a new file in local filesystem from V6 filesystem\nq - Quits the simulation.\n\n>>");
         
         // initialize needed strings
         char input[1000];
@@ -248,6 +289,8 @@ int main(){
             i++;
             command[i] = ch;
         }
+            
+        
 
         // using if-else structure since switch statements in C cannot be used for strings.
         if (strcmp("initfs\n", input) == 0)
@@ -256,6 +299,8 @@ int main(){
             q();
         else if (strcmp("cpin\n", input) == 0)
             cpin();
+        else if (strcmp("cpout\n", input) == 0)
+            cpout();
         else{
             printf("\nERROR: invalid input\n\n\n");
             continue;
