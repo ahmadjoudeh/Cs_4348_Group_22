@@ -208,6 +208,14 @@ void fs(){
     printf("\nPress Enter to return to the Main menu.\n\n>>");
     getchar();
 }
+
+inode_type getInode(int n) {
+    inode_type inode;
+    lseek(fd, 2* BLOCK_SIZE + (n-1)*INODE_SIZE, SEEK_SET);
+    read(fd, inode.addr[9], sizeof(inode));
+    return inode;
+}
+
 void cpin(){
     char fileBuf[BLOCK_SIZE]; // where the contents of the file will be stored
     char fileBuf2[BLOCK_SIZE];
@@ -263,6 +271,24 @@ void cpout(){
         }
 
     }
+        //open or create external file
+        int fd_external = open(nameBuf, O_CREAT | O_RDWR, 0644);
+
+        //Find inode that points to location in file system
+        int inode_number; //haven't figured out how to find the associated inode_number
+        inode_type file_inode = getInode(inode_number);
+        
+        //read contents at byte offset and write to external file
+        int i;
+        int content_size;
+        char content_buffer[BLOCK_SIZE];
+        for(i=0; i<9; i++) {
+            lseek(fd, BLOCK_SIZE*file_inode.addr[i], SEEK_SET);
+            read(fd, &content_buffer, BLOCK_SIZE);
+            write(fd_external, &content_buffer, BLOCK_SIZE);
+        }
+
+
 }
 
 // The main function
