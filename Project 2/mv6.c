@@ -108,7 +108,7 @@ int i;
 
     root.size0 = 0;
     root.size1 = 2 * sizeof(dir_type);
-    root.addr[0] = 2 + superBlock.free[superBlock.nfree--];
+    root.addr[0] = 2 + numInodes*sizeof(inode_type);
     for (i=1;i<9;i++) root.addr[i]=-1;//all other addr elements are null so setto -1
     inode_writer(inum, root);
 }
@@ -224,8 +224,8 @@ void cpin(){
     //open file for reading and place contents in buffer
     printf("Enter the name of the file in the local file system: ");
     
-   scanf("%s", nameBuf);
-   fflush(stdin);
+    scanf("%s", nameBuf);
+    fflush(stdin);
     FILE *file = fopen(nameBuf, "r");
     if(file != NULL)
         fgets(fileBuf, BLOCK_SIZE, file);
@@ -235,31 +235,32 @@ void cpin(){
     scanf("%s", nameBuf);
     fflush(stdin);
 
-    int x;
+    unsigned int x;
     x = get_free_block();
     lseek(fd, x * BLOCK_SIZE , SEEK_SET);
     write(fd, fileBuf, BLOCK_SIZE);
 
     int i;
     inode_type newInode;
+
+    newInode.size0 = 0;
+    newInode.size1 = sizeof(fileBuf);
+    newInode.addr[0] = 2 * BLOCK_SIZE + numInodes*sizeof(inode_type);
     for (i=1;i<9;i++) newInode.addr[i]=-1;
-    newInode.addr[0] = x;
-    inode_writer(++numInodes, newInode);
 
     dir_type newDir;
     strcpy((char*)newDir.filename, nameBuf);
     newDir.inode = numInodes;
+    root_dir[numInodes++] = newDir;
 
-    lseek(fd, x*BLOCK_SIZE,SEEK_SET);
-    read(fd, fileBuf2,3);
-    printf("\n%s\n", fileBuf2);
     
     fclose(file);
 }
 void cpout(){
     char nameBuf[1000]; // where the name of the file we create will be stored
+    char fileBuf[BLOCK_SIZE];
 
-    printf("Enter the name of the file in the local file system: ");
+    printf("Enter the name of the file in the V6 file system: ");
     scanf("%s", nameBuf);
     fflush(stdin);
     int target;
@@ -269,7 +270,11 @@ void cpout(){
             target = root_dir[i].inode;
             break;
         }
-
+    inode_type inInode;
+    inode_reader(target+1, inInode);
+    lseek(fd, inInode.addr[0],SEEK_SET);
+    read(fd, fileBuf, BLOCK_SIZE);
+    printf("\n%s\n", fileBuf);
     }
         //open or create external file
         int fd_external = open(nameBuf, O_CREAT | O_RDWR, 0644);
