@@ -113,6 +113,32 @@ int i;
     inode_writer(inum, root);
 }
 
+int get_inode_number(char* fname, int fd, int flag){
+    inode_type inode;
+    dir_type directory;
+    int fInode;
+    lseek(fd, 1024 * 2, SEEK_SET);
+    read(fd, &inode, sizeof(inode));
+
+    lseek(fd, 1024 * inode.addr[0],SEEK_SET);
+    int n = 1024 / sizeof(directory);
+    int i;
+    for(i = 0; i < n; i++){
+        read(fd, &directory, sizeof(directory));
+        if(strncmp(fname, dir.fname, 28) == 0){
+            fInode = dir.inode;
+            if(flag == 1){
+                dir.fname[0] = 0;
+                dir.inode = -1;
+                lseek(fd, 0, SEEK_CUR);
+                write(fd, &directory, sizeof(directory));
+            }
+            return fInode;
+        }
+    }
+    return -1;
+}
+
 // initializes file system, superblock, root directory etc.
 void initfs(char *file_name , int n1, int n2){
     int fd = open_fs(file_name);
