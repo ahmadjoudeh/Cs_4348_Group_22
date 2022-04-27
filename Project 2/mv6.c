@@ -125,11 +125,11 @@ int get_inode_number(char* fname, int fd, int flag){
     int i;
     for(i = 0; i < n; i++){
         read(fd, &directory, sizeof(directory));
-        if(strncmp(fname, dir.fname, 28) == 0){
-            fInode = dir.inode;
+        if(strncmp(fname, directory.filename, 28) == 0){
+            fInode = directory.inode;
             if(flag == 1){
-                dir.fname[0] = 0;
-                dir.inode = -1;
+                directory.filename[0] = 0;
+                directory.inode = -1;
                 lseek(fd, 0, SEEK_CUR);
                 write(fd, &directory, sizeof(directory));
             }
@@ -296,6 +296,7 @@ void cpout(){
     printf("\n%s\n", fileBuf);
     }
         //open or create external file
+        strcat(nameBuf, ".txt");
         int fd_external = open(nameBuf, O_CREAT | O_RDWR, 0644);
 
         //Find inode that points to location in file system
@@ -304,7 +305,6 @@ void cpout(){
         file_inode = inode_reader(inode_number, file_inode);
         
         //read contents at byte offset and write to external file
-        int i;
         int content_size;
         char content_buffer[BLOCK_SIZE];
         for(i=0; i<9; i++) {
@@ -312,7 +312,7 @@ void cpout(){
             read(fd, &content_buffer, BLOCK_SIZE);
             write(fd_external, &content_buffer, BLOCK_SIZE);
         }
-
+        printf("%s", content_buffer);
 
 }
 
