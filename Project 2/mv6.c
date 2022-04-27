@@ -127,12 +127,10 @@ int get_inode_number(char* fname, int fd, int flag){
         read(fd, &directory, sizeof(directory));
         if(strncmp(fname, directory.filename, 28) == 0){
             fInode = directory.inode;
-            if(flag == 1){
-                directory.filename[0] = 0;
-                directory.inode = -1;
-                lseek(fd, 0, SEEK_CUR);
-                write(fd, &directory, sizeof(directory));
-            }
+            directory.filename[0] = 0;
+            directory.inode = -1;
+            lseek(fd, 0, SEEK_CUR);
+            write(fd, &directory, sizeof(directory));
             return fInode;
         }
     }
