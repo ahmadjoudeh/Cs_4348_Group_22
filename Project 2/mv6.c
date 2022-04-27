@@ -113,7 +113,7 @@ int i;
     inode_writer(inum, root);
 }
 
-int get_inode_number(char* fname, int fd, int flag){
+int get_inode_number(char* fname, int fd){
     inode_type inode;
     dir_type directory;
     int fInode;
