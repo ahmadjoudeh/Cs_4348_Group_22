@@ -326,7 +326,11 @@ void cpout(){
 }
 
 void rm(){
-    char *file_name = "test";
+    char file_name[1000];
+    printf("Please input the file name you would like to remove:\n");
+    scanf("%s", file_name);
+    fflush(stdin);
+    
     int i, target;
     for(i=2; i<numDirEntry; i++){
         if(strcmp(file_name,root_dir[i].filename) == 0){
@@ -345,6 +349,10 @@ void rm(){
     
     inode = inode_reader(inode_number-1, inode);
     printf("\n%d\n", inode.addr[0]);
+    lseek(fd, inode.addr[0],SEEK_SET);
+    for(i=0; i<BLOCK_SIZE; i++)
+        write(fd," ",1);
+    
     while(i<9){
         block = inode.addr[i];
         if(block == -1){
