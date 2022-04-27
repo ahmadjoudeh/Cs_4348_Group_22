@@ -113,7 +113,7 @@ int i;
     inode_writer(inum, root);
 }
 
-int get_inode_number(char* fname, int fd, int flag){
+int get_inode_number(char* fname, int fd){
     inode_type inode;
     dir_type directory;
     int fInode;
@@ -127,12 +127,10 @@ int get_inode_number(char* fname, int fd, int flag){
         read(fd, &directory, sizeof(directory));
         if(strncmp(fname, directory.filename, 28) == 0){
             fInode = directory.inode;
-            if(flag == 1){
-                directory.filename[0] = 0;
-                directory.inode = -1;
-                lseek(fd, 0, SEEK_CUR);
-                write(fd, &directory, sizeof(directory));
-            }
+            directory.filename[0] = 0;
+            directory.inode = -1;
+            lseek(fd, 0, SEEK_CUR);
+            write(fd, &directory, sizeof(directory));
             return fInode;
         }
     }
@@ -326,6 +324,28 @@ void cpout(){
             write(fd_external, &content_buffer, BLOCK_SIZE);
             memset(content_buffer, 0, BLOCK_SIZE);
         }
+}
+
+void rm(int fd, char* file_name){
+    inode_type inode;
+    unsigned int inode_number;
+    unsigned int block;
+    unsigned int i;
+    inode_number = get_inode_number(file_name, fd, 1);
+    if(inode_number == -1){
+        //file is not found
+        return;
+    }
+    inode = inode_reader(fd, inode_number, inode);
+    while(i<9){
+        block = inode.addr[i];
+        if(block == -1){
+            break;
+        }
+        add_free_block(block);
+        i++;
+    }
+    inode_writer(fd, inode_number, inode);
 }
 
 // The main function
