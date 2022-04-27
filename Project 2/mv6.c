@@ -314,6 +314,28 @@ void cpout(){
 
 }
 
+void rm(int fd, char* file_name){
+    inode_type inode;
+    unsigned int inode_number;
+    unsigned int block;
+    unsigned int i;
+    inode_number = get_inode_number(file_name, fd, 1);
+    if(inode_number == -1){
+        //file is not found
+        return;
+    }
+    inode = inode_reader(fd, inode_number, inode);
+    while(i<9){
+        block = inode.addr[i];
+        if(block == -1){
+            break;
+        }
+        add_free_block(block);
+        i++;
+    }
+    inode_writer(fd, inode_number, inode);
+}
+
 // The main function
 int main(){
     while(true){
