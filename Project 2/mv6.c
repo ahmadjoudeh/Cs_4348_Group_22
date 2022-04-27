@@ -310,7 +310,6 @@ void cpout(){
 
         //Find inode that points to location in file system
         int inode_number = target;
-        printf("\n%d\n", inode_number);
 
         inode_type file_inode;
         file_inode = inode_reader(inode_number-1, file_inode);
@@ -326,17 +325,26 @@ void cpout(){
         }
 }
 
-void rm(int fd, char* file_name){
+void rm(){
+    char *file_name = "test";
+    int i, target;
+    for(i=2; i<numDirEntry; i++){
+        if(strcmp(file_name,root_dir[i].filename) == 0){
+            target = root_dir[i].inode;
+            break;
+        }
+    }
     inode_type inode;
     unsigned int inode_number;
     unsigned int block;
-    unsigned int i;
-    inode_number = get_inode_number(file_name, fd, 1);
+    inode_number = target;
     if(inode_number == -1){
         //file is not found
         return;
     }
-    inode = inode_reader(fd, inode_number, inode);
+    
+    inode = inode_reader(inode_number-1, inode);
+    printf("\n%d\n", inode.addr[0]);
     while(i<9){
         block = inode.addr[i];
         if(block == -1){
@@ -345,7 +353,7 @@ void rm(int fd, char* file_name){
         add_free_block(block);
         i++;
     }
-    inode_writer(fd, inode_number, inode);
+    inode_writer(inode_number, inode);
 }
 
 // The main function
@@ -356,7 +364,7 @@ int main(){
        
         // prompt user for input
         printf("Available commands:\n");
-        printf("initfs - Initializes file system with specified parameters.\ncpin - Create a new file inside V6 file system, using a file from local filesystem\ncpout - create a new file in local filesystem from V6 filesystem\nq - Quits the simulation.\n\n>>");
+        printf("initfs - Initializes file system with specified parameters.\ncpin - Create a new file inside V6 file system, using a file from local filesystem\ncpout - create a new file in local filesystem from V6 filesystem\nrm - remove a file from V6 file system\nq - Quits the simulation.\n\n>>");
         
         // initialize needed strings
         char input[1000];
@@ -382,6 +390,8 @@ int main(){
             cpin();
         else if (strcmp("cpout\n", input) == 0)
             cpout();
+        else if (strcmp("rm\n", input) == 0)
+            rm();
         else{
             printf("\nERROR: invalid input\n\n\n");
             continue;
