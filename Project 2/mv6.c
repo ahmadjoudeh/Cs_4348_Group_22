@@ -246,6 +246,19 @@ void cpin(){
     scanf("%s", nameBuf);
     fflush(stdin);
     FILE *file = fopen(nameBuf, "r");
+
+    /*
+    long fileSize;
+    fileSize = lseek(file, 0, SEEK_END);
+    if(fileSize <= 9216)
+        // set small
+    else if(fileSize <= 2359296)
+        // set medium
+    else if(fileSize <= 603979776)
+        // set large
+    else
+        // set extra large
+    */
     if(file != NULL)
         fgets(fileBuf, BLOCK_SIZE, file);
 
@@ -255,8 +268,8 @@ void cpin(){
     fflush(stdin);
 
     unsigned int x;
-    x = get_free_block();
-    lseek(fd, x * BLOCK_SIZE , SEEK_SET);
+    x = get_free_block() * BLOCK_SIZE;
+    lseek(fd, x , SEEK_SET);
     write(fd, fileBuf, BLOCK_SIZE);
 
     int i;
@@ -264,15 +277,19 @@ void cpin(){
 
     newInode.size0 = 0;
     newInode.size1 = sizeof(fileBuf);
-    newInode.addr[0] = 2 * BLOCK_SIZE + numInodes*sizeof(inode_type);
+    newInode.addr[0] = x;
     for (i=1;i<9;i++) newInode.addr[i]=-1;
 
     dir_type newDir;
     strcpy((char*)newDir.filename, nameBuf);
-    newDir.inode = numInodes;
-    root_dir[numInodes++] = newDir;
-
     
+    newDir.inode = ++numInodes;
+    root_dir[numDirEntry++] = newDir;
+
+    inode_writer(numInodes-1,newInode);
+    
+    printf("\n%d\n", newInode.addr[0]);
+
     fclose(file);
 }
 void cpout(){
@@ -289,31 +306,26 @@ void cpout(){
             target = root_dir[i].inode;
             break;
         }
-    inode_type inInode;
-    inode_reader(target+1, inInode);
-    lseek(fd, inInode.addr[0],SEEK_SET);
-    read(fd, fileBuf, BLOCK_SIZE);
-    printf("\n%s\n", fileBuf);
     }
         //open or create external file
-        strcat(nameBuf, ".txt");
         int fd_external = open(nameBuf, O_CREAT | O_RDWR, 0644);
 
         //Find inode that points to location in file system
-        int inode_number; //haven't figured out how to find the associated inode_number
+        int inode_number = target;
+        printf("\n%d\n", inode_number);
+
         inode_type file_inode;
-        file_inode = inode_reader(inode_number, file_inode);
+        file_inode = inode_reader(inode_number-1, file_inode);
         
         //read contents at byte offset and write to external file
         int content_size;
         char content_buffer[BLOCK_SIZE];
         for(i=0; i<9; i++) {
-            lseek(fd, BLOCK_SIZE*file_inode.addr[i], SEEK_SET);
+            lseek(fd, file_inode.addr[i], SEEK_SET);
             read(fd, &content_buffer, BLOCK_SIZE);
             write(fd_external, &content_buffer, BLOCK_SIZE);
+            memset(content_buffer, 0, BLOCK_SIZE);
         }
-        printf("%s", content_buffer);
-
 }
 
 // The main function
@@ -340,9 +352,7 @@ int main(){
             i++;
             command[i] = ch;
         }
-            
         
-
         // using if-else structure since switch statements in C cannot be used for strings.
         if (strcmp("initfs\n", input) == 0)
             fs();
